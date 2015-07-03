@@ -1,4 +1,0 @@
-WORKING_DIR='puppet-cluster'
-if [[ ! -d "$WORKING_DIR" ]]; then
-  git clone git@git.apidb.org:puppet-cluster.git
-fi
