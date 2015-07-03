@@ -1,0 +1,27 @@
+# If your home directory on the workflow server is shared via
+# NFS to other servers (as is typical for pcbi.upenn.edu),
+# you should source the global /etc/bashrc so the non-workflow
+# servers sharing your .bashrc will get a default configuration.
+# It is generally advised not to include this for your cluster account.
+# If you do source /etc/bashrc, it must come before the workflow bashrc.
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+# Set up environemnt for workflow software
+if [[ -f /genomics/eupath/workflow-software/etc/bashrc ]]; then
+  # Penn PGFI cluster
+  . /genomics/eupath/workflow-software/etc/bashrc
+elif [[ -f /project/eupathdblab/workflow-software/etc/bashrc ]]; then
+  # Penn PMACS cluster
+  . /project/eupathdblab/workflow-software/etc/bashrc
+elif [[ -f /panfs/pstor.storage/jckscratch/eupath/workflow-software/etc/bashrc ]]; then
+  # UGA zcluster
+  . /panfs/pstor.storage/jckscratch/eupath/workflow-software/etc/bashrc
+elif [[ -f  /usr/local/lab/eupathdb/workflow-software/etc/bashrc ]]; then
+  # UGA sapelo
+  . /usr/local/lab/eupathdb/workflow-software/etc/bashrc
+elif [[ -f /eupath/workflow-software/etc/bashrc ]]; then
+  # EuPath workflow controller server
+  . /eupath/workflow-software/etc/bashrc
+fi
