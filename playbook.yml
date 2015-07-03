@@ -1,6 +1,8 @@
 ---
 - hosts: all
   sudo: yes
+  vars:
+    wf_user: debbie
 
   tasks:
   
@@ -22,14 +24,29 @@
       sudo: no
 
     - name: initialize sysadmin directory
-      script: init.sh {{ wf_base_dir }}
+      script: init.sh "{{ wf_base_dir }}"
               creates="{{ wf_base_dir }}/sysadmin"
       sudo: no
 
     - name: add workflow user
-      user: name=debbie
+      user: name="{{ wf_user }}"
             shell=/bin/bash
 
+    - name: fetch vagrant authorized_keys
+      fetch: src=/home/vagrant/.ssh/authorized_keys
+             dest=staging/authorized_keys
+             flat=yes
+
     - name: workflow user authorized_keys
-      authorized_key: user=debbie
-                      key="{{ lookup('file', "/home/{{ sysadmin }}/.ssh/id_rsa.pub") }}"
+      authorized_key: user="{{ wf_user }}"
+                      key="{{ lookup('file', 'staging/authorized_keys') }}"
+
+    - name: install workflow bashrc
+      copy: src=workflow_bashrc
+            dest="/home/{{ wf_user }}/.bashrc"
+            owner="{{ wf_user }}"
+            mode=0644
+
+    - name: run workpuppet
+      script: runworkpuppet.sh "{{ wf_base_dir }}"
+      sudo: no

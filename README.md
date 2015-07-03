@@ -1,23 +1,36 @@
 ## vagrant-cluster-centos-6
 
-Sets up a virtual machine for developing and testing workflow software deployment for compute clusters and workflow servers. See https://wiki.apidb.org/index.php/PreparingClusters for specifications.
+Vagrant manifest to set up a VirtualBox instance for developing and testing workflow software deployment for compute clusters and workflow servers. See https://wiki.apidb.org/index.php/PreparingClusters for specifications.
 
 ### Usage
 
     git clone 
     vagrant up
 
-### A warning about working remotely
+## Simulating workflow user
+
+`vagrant ssh -- -l debbie`
+
+## Updating workflow software
+
+The `workpuppet` script (see wiki) is run on each invocation of `vagrant provision`. In this case `workpuppet` is run by Ansible which eats stdout. Alternatively you can, ssh to the guest and run the command. This options allow you to monitor progress through stdout and more closely simulates how cluster software is updated in the wild.
+
+    vagrant ssh -c 'source /eupath/workflow-software/sysadmin/bashrc; workpuppet'
+
+### Requirements
+
+__Software__
+
+- Vagrant
+- VirtualBox
+
+__Environment__
+
+Git cloning from git.apidb.org requires ssh key authentication. The `Vagrantfile` specifies `config.ssh.forward_agent = true` to use your host ssh agent - so you need an agent running.
+
+The `init.sh` provisioning assumes a VM that mounts the Vagrant project directory from host to `/vagrant` on the guest. The `puppetlabs/centos-6.6-64-nocm` specified in the `Vagrantfile` satisfies this requirement.
 
 One of the temptations of having a virtualized development environment is working off-campus or offline. Be aware that the provisioning and many other operations require network access to resources behind UGA firewalls and/or expect clients originating from trusted IP addresses. If you don't meet expected network conditions, silent or cryptic failures await you. If you work remotely, fire up UGA's VPN and you should be OK.
-
-### Vagrantfile
-
-The `Vagrantfile` sets the variable `WF_BASE_DIR` as the path to the parent directory that will hold the workflow software and administrative infrastructure.
-
-Git cloning from git.apidb.org requires ssh key authentication. The `Vagrantfile` specifies `config.ssh.forward_agent = true` to use your host ssh agent - so you need one agent running.
-
-The `init.sh` provisioning assumes a VM that mounts the Vagrant project directory from host to `/vagrant` on the guest. The `puppetlabs/centos-6.6-64-nocm` specified satisfies this requirement.
 
 
 ### Provisioning
