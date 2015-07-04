@@ -25,3 +25,4 @@ elif [[ -f /eupath/workflow-software/etc/bashrc ]]; then
   # EuPath workflow controller server
   . /eupath/workflow-software/etc/bashrc
 fi
+

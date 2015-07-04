@@ -22,7 +22,10 @@ curl -s -O http://software.apidb.org/source/ruby-1.8.7-p357.tar.gz
 curl -s -O http://software.apidb.org/source/openssl-1.0.1j.tar.gz
 curl -s -O http://software.apidb.org/source/rubygems-1.8.15.tgz
 
-for i in * ; do tar zxf $i; done;
+for i in *gz; do
+  file "$i" | grep -q 'gzip compressed' || { echo "$PWD/$i is not valid"; exit 1; }
+  tar zxf $i;
+done;
 
 cd $admin_path/src/openssl-1.0.1j
 
