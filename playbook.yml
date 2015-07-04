@@ -6,22 +6,24 @@
 
       # Some resources are behind firewalls and access rules. Test early
       # that we have access to them.
-#    - name: testing access to restricted URL
-#      get_url: url=http://software.apidb.org/source/
-#               dest=/dev/null
-#               force=yes
-#      changed_when: false
-
-    - shell: env > before
-      sudo: no
+    - name: testing access to restricted URL
+      get_url: url=http://software.apidb.org/source/
+               dest=/dev/null
+               force=yes
+      changed_when: false
 
     - name: change sysadmin user group
       group: name="{{ wf_group }}" state=present
     - user: name="{{ sysadmin }}"
             group="{{ wf_group }}"
+      register: disconnect
 
-    - shell: env > after
+    - name: disconnect
+      # Force ssh reconnect for new shell with updated group info.
+      # by killing the client ssh multiplex process on the ansible driver.
+      local_action: command pkill -f "ansible-ssh-{{ ansible_ssh_host }}-{{ ansible_ssh_port }}-"
       sudo: no
+      when: disconnect|changed
 
     - name: install zlib-devel
       yum:  name=zlib-devel
@@ -71,16 +73,6 @@
       with_items:
         - { user: "{{ sysadmin }}" }
         - { user: "{{ wf_user }}" }
-
-    # We change the primary group for the vagrant user earlier but Ansible's
-    # persistent ssh connections means that the user does not yet know about
-    # the {{ wf_group }}. This causes Puppet (workpuppet) to fail to 
-    # set the group
-#    - name: hack permissions
-#      file: path="{{ wf_base_dir }}/workflow-software/tmp"
-#            state=directory
-#            owner="{{ sysadmin }}"
-#            group="{{ wf_group }}"
 
     - name: run workpuppet
       script: runworkpuppet.sh "{{ wf_base_dir }}"
