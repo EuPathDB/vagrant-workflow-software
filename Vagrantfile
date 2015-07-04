@@ -13,9 +13,6 @@ Vagrant.configure(2) do |config|
   config.vm.hostname = WF_HOST
   config.ssh.username = 'vagrant'
 
-#  config.vm.provison 'add group' :type => :shell, :inline => "groupadd -f #{WF_GROUP}"
-#  config.vm.provison 'set sysadmin group' :type => :shell, :inline => "usermod -g #{WF_GROUP} #{config.ssh.username}"
-
   config.vm.provision :ansible do |ansible|
     ansible.playbook = "playbook.yml"
     ansible.extra_vars = {
