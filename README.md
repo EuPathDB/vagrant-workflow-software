@@ -12,7 +12,8 @@ __Software__
 
 ### Usage
 
-    git clone 
+    git clone git@github.com:EuPathDB/vagrant-workflow-software.git
+    cd vagrant-workflow-software
     vagrant up
 
 ### Vagrantfile
