@@ -49,6 +49,7 @@
 
     - name: add workflow user
       user: name="{{ wf_user }}"
+            group="{{ wf_group }}"
             shell=/bin/bash
 
     - name: fetch vagrant authorized_keys
