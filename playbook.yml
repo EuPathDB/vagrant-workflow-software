@@ -13,14 +13,15 @@
       changed_when: false
 
     - name: change sysadmin user group
-      group: name="{{ wf_group }}" state=present
+      group: name="{{ wf_shared_group }}" state=present
     - user: name="{{ sysadmin }}"
-            group="{{ wf_group }}"
+            group="{{ wf_shared_group }}"
       register: disconnect
 
     - name: disconnect
-      # Force ssh reconnect for new shell with updated group info.
-      # by killing the client ssh multiplex process on the ansible driver.
+      # Force ssh reconnect to get a new shell with updated group info (so files get
+      # correct group ownership). This is done by killing the client ssh multiplex process
+      # on the ansible driver.
       local_action: command pkill -f "ansible-ssh-{{ ansible_ssh_host }}-{{ ansible_ssh_port }}-"
       sudo: no
       when: disconnect|changed
@@ -31,10 +32,10 @@
       yum:  name=git
 
     - name: Create base directory
-      file: path="{{ wf_base_dir }}"
+      file: path="{{ wf_user_dir }}"
             state=directory
             owner="{{ sysadmin }}"
-            group="{{ wf_group }}"
+            group="{{ wf_shared_group }}"
 
     - name: add git host to known_hosts
       known_hosts: path="/home/{{ sysadmin }}/.ssh/known_hosts"
@@ -43,23 +44,23 @@
       sudo: no
 
     - name: initialize sysadmin directory
-      script: init.sh "{{ wf_base_dir }}"
-              creates="{{ wf_base_dir }}/sysadmin"
+      script: init.sh "{{ wf_user_dir }}"
+              creates="{{ wf_user_dir }}/sysadmin"
       sudo: no
 
     - name: add workflow user
       user: name="{{ wf_user }}"
-            group="{{ wf_group }}"
+            group="{{ wf_shared_group }}"
             shell=/bin/bash
 
     - name: fetch vagrant authorized_keys
       fetch: src=/home/vagrant/.ssh/authorized_keys
-             dest=staging/authorized_keys
+             dest=scratch/authorized_keys
              flat=yes
 
     - name: workflow user authorized_keys
       authorized_key: user="{{ wf_user }}"
-                      key="{{ lookup('file', 'staging/authorized_keys') }}"
+                      key="{{ lookup('file', 'scratch/authorized_keys') }}"
 
     - name: install workflow bashrc
       copy: src=workflow_bashrc
@@ -76,6 +77,6 @@
         - { user: "{{ wf_user }}" }
 
     - name: run workpuppet
-      script: runworkpuppet.sh "{{ wf_base_dir }}"
+      script: runworkpuppet.sh "{{ wf_user_dir }}"
       sudo: no
       changed_when: false

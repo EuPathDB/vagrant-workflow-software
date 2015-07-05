@@ -1,4 +1,4 @@
-## vagrant-cluster-centos-6
+## vagrant-workflow-software
 
 Vagrant manifest to set up a VirtualBox instance for developing and testing the deployment of workflow software for compute clusters and workflow servers. See https://wiki.apidb.org/index.php/PreparingClusters for specifications.
 
@@ -14,6 +14,23 @@ __Software__
 
     git clone 
     vagrant up
+
+### Vagrantfile
+
+The `Vagrantfile` specifies some variables at the top.
+
+    WF_HOST = 'consign.pmacs.upenn.edu'
+    WF_USER_PATH = '/project/eupathdblab/workflow-software'
+    WF_SHARED_GROUP = 'eupathdblab'
+    WF_USER = 'debbie'
+
+`WF_HOST` can be given the name of an existing cluster. This permits using an existing Puppet node manifest and leverages existing profile configurations (e.g. `$eupath_dir/etc/bashrc`) that use hostname conditionals. Note that different compute clusters use various OS versions (e.g. CentOS 5 and CentOS 6). Be sure `config.vm.box` in the `Vagrantfile` is configured for a Vagrant box with a matching OS for the chosen `WF_HOST`.
+
+`WF_USER_PATH` should match `user_path` in the Puppet node manifest for the host.
+
+`WF_SHARED_GROUP` should match `shared_group` in the Puppet node manifest for the host.
+
+`WF_USER` can be any name. An account of this name will be created on the virtual machine and its shell environment will be configured as a typical workflow user. This account is optionally used for testing.
 
 ### Simulating a workflow user
 
@@ -37,6 +54,8 @@ Interactive changes and gefingerpoken can, of course, also be done from the `vag
 
     vagrant ssh
 
+_Caution: When screwing around in terminal windows be very careful which window you are working in. Because the virtual machine may have the same name as a real server, and because you may have terminals open to both, you want to be sure to keep track of the difference, lest you accidentally do development changes on the real server. The user shells on the virtual machine are configured with a distinctive command prompt to help disambiguate virtual from real._
+
 __The Development Environment__
 
 Git cloning from git.apidb.org requires ssh key authentication. The `Vagrantfile` specifies `config.ssh.forward_agent = true` to use your host ssh agent - so you need an agent running.
@@ -52,6 +71,6 @@ The `init.sh` script initializes and bootstraps the `${BASE_DIR}/sysadmin` direc
 
 Invocations of `vagrant provision` after the initial setup will always invoke the `workpuppet` script. This script manages the YUM repo updates and runs the `puppet apply`.
 
-The git repo of Puppet manifests is checked out to the guest `/vagrant/staging` mount point and symlinked in to the `${BASE_DIR}/sysadmin` directory. The `/vagrant` volume is provided by the host so its contents persist across `vagrant destroy` (reducing the changes of losing uncommitted changes). This also has the side-effect that Puppet manifest editing and Git management can be done on you local host.
+The git repo of Puppet manifests is checked out to the guest `/vagrant/scratch` mount point and symlinked in to the `${BASE_DIR}/sysadmin` directory. The `/vagrant` volume is provided by the host so its contents persist across `vagrant destroy` (reducing the changes of losing uncommitted changes). This also has the side-effect that Puppet manifest editing and Git management can be done on you local host.
 
-The `yum-workflow` directory is also symlinked in `${BASE_DIR}/sysadmin` to the `/vagrant/staging` mountpoint on the guest, shared with the host, so it is persistent across `vagrant destroy`. This is just to save download time. The directory can be deleted manually if you want to test a complete provision from scratch.
+The `yum-workflow` directory is also symlinked in `${BASE_DIR}/sysadmin` to the `/vagrant/scratch` mountpoint on the guest, shared with the host, so it is persistent across `vagrant destroy`. This is just to save download time. The directory can be deleted manually if you want to test a complete provision from scratch.

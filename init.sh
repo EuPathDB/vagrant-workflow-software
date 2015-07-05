@@ -72,7 +72,7 @@ EOF
 # to aid editing, committing on host and to retain changes
 # across vagrant destroy. This is Vagrant-specific. This
 # would be cloned in situ on a real cluster.
-git_wd=/vagrant/staging/puppet-cluster
+git_wd=/vagrant/scratch/puppet-cluster
 if [[ ! -d $git_wd ]]; then
   git clone git@git.apidb.org:puppet-cluster.git $git_wd
 fi
@@ -93,6 +93,6 @@ cp $admin_path/puppet/modules/software/files/workpuppet $admin_path/bin/
 # just to save download time when re-provisioning a VM. 
 # This is Vagrant-specific. On a real cluster this directory is
 # created in situ by the workpuppet script.
-mkdir /vagrant/staging/yum-workflow
-ln -s /vagrant/staging/yum-workflow $admin_path/yum-workflow
+mkdir /vagrant/scratch/yum-workflow
+ln -s /vagrant/scratch/yum-workflow $admin_path/yum-workflow
 
