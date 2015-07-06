@@ -17,7 +17,6 @@
     - user: name="{{ sysadmin }}"
             group="{{ wf_shared_group }}"
       register: disconnect
-
     - name: disconnect
       # Force ssh reconnect to get a new shell with updated group info (so files get
       # correct group ownership). This is done by killing the client ssh multiplex process
@@ -26,6 +25,9 @@
       sudo: no
       when: disconnect|changed
 
+    - name: install python-hashlib # for yumdownloader/yum 3.2.22
+      yum:  name=python-hashlib
+      when: ansible_distribution_major_version == '5'
     - name: install zlib-devel
       yum:  name=zlib-devel
     - name: install git
@@ -43,7 +45,7 @@
                    key="{{ lookup('pipe','ssh-keyscan git.apidb.org') }}"
       sudo: no
 
-    - name: initialize sysadmin directory
+    - name: initialize sysadmin directory (this will take a while)
       script: init.sh "{{ wf_user_dir }}"
               creates="{{ wf_user_dir }}/sysadmin"
       sudo: no
@@ -52,6 +54,17 @@
       user: name="{{ wf_user }}"
             group="{{ wf_shared_group }}"
             shell=/bin/bash
+
+      # Set a shell prompt that clearly distinguishes this VM from a real server of
+      # the same name (to help avoid accidentally doing dev work on the real server
+      # when you terminals open to both).
+    - name: set shell prompt
+      lineinfile: dest=/home/{{ item.user }}/.bash_profile
+                  regexp="^export PS1="
+                  line='export PS1="[\[$(tput setaf 1)\]\[$(tput bold)\]Simulated \[$(tput sgr0)\]\u@\h \W]\\n\[$(tput setaf 2)\]\\$ \[$(tput sgr0)\]\[$(tput sgr0)\]"'
+      with_items:
+        - { user: "{{ sysadmin }}" }
+        - { user: "{{ wf_user }}" }
 
     - name: fetch vagrant authorized_keys
       fetch: src=/home/vagrant/.ssh/authorized_keys
@@ -73,15 +86,7 @@
                   regexp="^export admin_path={{ wf_user_dir }}/{{ sysadmin }}"
                   line="export admin_path={{ wf_user_dir }}/sysadmin"
 
-    - name: set shell prompt
-      lineinfile: dest=/home/{{ item.user }}/.bash_profile
-                  regexp="^export PS1="
-                  line='export PS1="[\[$(tput setaf 1)\]\[$(tput bold)\]Simulated \[$(tput sgr0)\]\u@\h \W]\\n\[$(tput setaf 2)\]\\$ \[$(tput sgr0)\]\[$(tput sgr0)\]"'
-      with_items:
-        - { user: "{{ sysadmin }}" }
-        - { user: "{{ wf_user }}" }
-
-    - name: run workpuppet
+    - name: run workpuppet (this may take a while)
       script: runworkpuppet.sh "{{ wf_user_dir }}"
       sudo: no
       changed_when: false

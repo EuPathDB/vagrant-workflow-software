@@ -3,28 +3,60 @@
 # workflow servers. See https://wiki.apidb.org/index.php/PreparingClusters
 # for specifications.
 
-WF_HOST = 'consign.pmacs.upenn.edu'
-WF_USER_PATH = '/project/eupathdblab/workflow-software'
-WF_USER = 'debbie'
-WF_SHARED_GROUP = 'eupathdblab'
+WF_SERVERS = {
+  :rhel5 => {
+    :vagrant_box     => 'puppetlabs/centos-5.11-64-nocm',
+    :wf_hostname     => 'zcluster.rcc.uga.edu',
+    :wf_user_path    => '/panfs/pstor.storage/jckscratch/eupath/workflow-software',
+    :wf_user         => 'debbie',
+    :wf_shared_group => 'jcklab',
+  },
+  :rhel6 => {
+    :vagrant_box     => 'puppetlabs/centos-6.6-64-nocm',
+    :wf_hostname     => 'consign.pmacs.upenn.edu',
+    :wf_user_path    => '/project/eupathdblab/workflow-software',
+    :wf_user         => 'debbie',
+    :wf_shared_group => 'eupathdblab',
+  }
+}
 
 Vagrant.configure(2) do |config|
 
-  config.vm.box = "puppetlabs/centos-6.6-64-nocm"
-
   config.ssh.forward_agent = true
-
-  config.vm.hostname = WF_HOST
   config.ssh.username = 'vagrant'
 
-  config.vm.provision :ansible do |ansible|
-    ansible.playbook = "playbook.yml"
-    ansible.extra_vars = {
-      wf_user_dir: WF_USER_PATH,
-      sysadmin: config.ssh.username,
-      wf_user: WF_USER,
-      wf_shared_group: WF_SHARED_GROUP
-    }
-  end
+  WF_SERVERS.each do |name,cfg|
+    config.vm.define name do |vm_config|
 
-end
+      vm_config.vm.box      = cfg[:vagrant_box]   if cfg[:vagrant_box]
+      vm_config.vm.hostname = cfg[:wf_hostname]      if cfg[:wf_hostname]
+
+      # Prepare CentOS 5 to support Ansible
+      if ( /centos-5/.match(vm_config.vm.box) )
+        vm_config.vm.provision 'Install epel key',
+            :type => :shell,
+            :inline => 'rpm --import http://mirrors.mit.edu/epel/RPM-GPG-KEY-EPEL'
+        vm_config.vm.provision 'Install epel repo',
+            :type => :shell,
+            :inline => 'rpm -q --quiet epel-release-5-4 || rpm -U http://dl.fedoraproject.org/pub/epel/5/x86_64/epel-release-5-4.noarch.rpm'
+        vm_config.vm.provision 'Install centos key',
+            :type => :shell,
+            :inline => 'rpm --import http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-5'
+        vm_config.vm.provision 'Install json',
+            :type => :shell,
+            :inline => 'yum install -d 0 -e 0 -y python-simplejson'
+      end
+
+      vm_config.vm.provision :ansible do |ansible|
+        ansible.playbook = "playbook.yml"
+        ansible.extra_vars = {
+          sysadmin:        config.ssh.username,
+          wf_user_dir:     cfg[:wf_user_path],
+          wf_user:         cfg[:wf_user],
+          wf_shared_group: cfg[:wf_shared_group]
+        }
+      end
+
+    end # config.vm.define
+  end # WF_SERVERS.each
+end # Vagrant.configure

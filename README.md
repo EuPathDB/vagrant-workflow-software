@@ -18,20 +18,34 @@ __Software__
 
 ### Vagrantfile
 
-The `Vagrantfile` specifies some variables at the top.
+The `Vagrantfile` specifies a dictionary at the top.
 
-    WF_HOST = 'consign.pmacs.upenn.edu'
-    WF_USER_PATH = '/project/eupathdblab/workflow-software'
-    WF_SHARED_GROUP = 'eupathdblab'
-    WF_USER = 'debbie'
+    WF_SERVERS = {
+      :rhel5 => {
+        :vagrant_box     => 'puppetlabs/centos-5.11-64-nocm',
+        :wf_hostname     => 'zcluster.rcc.uga.edu',
+        :wf_user_path    => '/panfs/pstor.storage/jckscratch/eupath/workflow-software',
+        :wf_user         => 'debbie',
+        :wf_shared_group => 'jcklab',
+      },
+      :rhel6 => {
+        :vagrant_box     => 'puppetlabs/centos-6.6-64-nocm',
+        :wf_hostname     => 'consign.pmacs.upenn.edu',
+        :wf_user_path    => '/project/eupathdblab/workflow-software',
+        :wf_user         => 'debbie',
+        :wf_shared_group => 'eupathdblab',
+      }
+    }
 
-`WF_HOST` can be given the name of an existing cluster. This permits using an existing Puppet node manifest and leverages existing profile configurations (e.g. `$eupath_dir/etc/bashrc`) that use hostname conditionals. Note that different compute clusters use various OS versions (e.g. CentOS 5 and CentOS 6). Be sure `config.vm.box` in the `Vagrantfile` is configured for a Vagrant box with a matching OS for the chosen `WF_HOST`.
+This allows defining properties for multiple Vagrant boxes. The above example will set up CentOS 5 and CentOS 6 environments on two virtual machines. These will be named according the top key values (`rhel5` and `rhel6` in this example). These names will be used with `vagrant ssh` to identify which managed machine to connect to.
 
-`WF_USER_PATH` should match `user_path` in the Puppet node manifest for the host.
+`wf_hostname` can be given the name of an existing cluster. This permits using an existing Puppet node manifest and leverages existing profile configurations (e.g. `$eupath_dir/etc/bashrc`) that use hostname conditionals. Note that different compute clusters use various OS versions (e.g. CentOS 5 and CentOS 6). Be sure `config.vm.box` in the `Vagrantfile` is configured for a Vagrant box with a matching OS for the chosen `wf_hostname`.
 
-`WF_SHARED_GROUP` should match `shared_group` in the Puppet node manifest for the host.
+`wf_user_path` should match `user_path` in the Puppet node manifest for the host.
 
-`WF_USER` can be any name. An account of this name will be created on the virtual machine and its shell environment will be configured as a typical workflow user. This account is optionally used for testing.
+`wf_shared_group` should match `shared_group` in the Puppet node manifest for the host.
+
+`wf_user` can be any name. An account of this name will be created on the virtual machine and its shell environment will be configured as a typical workflow user. This account is optionally used for testing.
 
 ### Simulating a workflow user
 
@@ -39,7 +53,9 @@ The vagrant box includes the account `debbie` whose `.bashrc` matches that of a 
 
 To log in as `debbie`, run
 
-    vagrant ssh -- -l debbie
+    vagrant ssh rhel6 -- -l debbie
+
+where `rhel6` is Vagrant box you want to connect to (as defined in the Vagrantfile's `WF_SERVER` dictionary).
 
 ### Updating workflow software
 
@@ -49,11 +65,15 @@ The `workpuppet` script (see wiki) is run on each invocation of `vagrant provisi
 
 Alternatively you can, ssh to the virtual machine and run the command manually. This option allow you to monitor progress through stdout and more closely simulates how cluster software is updated in the wild.
 
-    vagrant ssh -c 'source $admin_path/bashrc; workpuppet'
+    vagrant ssh rhel5 -c 'source $admin_path/bashrc; workpuppet'
+
+where `rhel5` is Vagrant box you want to connect to (as defined in the Vagrantfile's `WF_SERVER` dictionary).
 
 Interactive changes and gefingerpoken can, of course, also be done from the `vagrant` shell. To log in as `vagrant`, run
 
-    vagrant ssh
+    vagrant ssh rhel5
+
+where `rhel5` is Vagrant box you want to connect to (as defined in the Vagrantfile's `WF_SERVER` dictionary).
 
 _Caution: When screwing around in terminal windows be very careful which window you are working in. Because the virtual machine may have the same name as a real server, and because you may have terminals open to both, you want to be sure to keep track of the difference, lest you accidentally do development changes on the real server. The user shells on the virtual machine are configured with a distinctive command prompt to help disambiguate virtual from real._
 
