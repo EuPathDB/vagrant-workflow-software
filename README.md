@@ -39,7 +39,7 @@ The `Vagrantfile` specifies a dictionary at the top.
 
 This allows defining properties for multiple Vagrant boxes. The above example will set up CentOS 5 and CentOS 6 environments on two virtual machines. These will be named according the top key values (`rhel5` and `rhel6` in this example). These names will be used with `vagrant ssh` to identify which managed machine to connect to.
 
-`wf_hostname` can be given the name of an existing cluster. This permits using an existing Puppet node manifest and leverages existing profile configurations (e.g. `$eupath_dir/etc/bashrc`) that use hostname conditionals. Note that different compute clusters use various OS versions (e.g. CentOS 5 and CentOS 6). Be sure `config.vm.box` in the `Vagrantfile` is configured for a Vagrant box with a matching OS for the chosen `wf_hostname`.
+`wf_hostname` can be given the name of an existing cluster. This permits using an existing Puppet node manifest and leverages existing profile configurations (e.g. `$eupath_dir/etc/bashrc`) that use hostname conditionals. Note that different compute clusters use various OS versions (e.g. CentOS 5 and CentOS 6). Be sure the `vagrant_box` in the `WF_SERVERS` dictionary is configured for a Vagrant box with a matching OS for the chosen `wf_hostname`.
 
 `wf_user_path` should match `user_path` in the Puppet node manifest for the host.
 
