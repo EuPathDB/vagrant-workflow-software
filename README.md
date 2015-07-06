@@ -49,7 +49,7 @@ The `workpuppet` script (see wiki) is run on each invocation of `vagrant provisi
 
 Alternatively you can, ssh to the virtual machine and run the command manually. This option allow you to monitor progress through stdout and more closely simulates how cluster software is updated in the wild.
 
-    vagrant ssh -c 'source /eupath/workflow-software/sysadmin/bashrc; workpuppet'
+    vagrant ssh -c 'source $admin_path/bashrc; workpuppet'
 
 Interactive changes and gefingerpoken can, of course, also be done from the `vagrant` shell. To log in as `vagrant`, run
 

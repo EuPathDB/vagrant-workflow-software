@@ -68,6 +68,11 @@
             owner="{{ wf_user }}"
             mode=0644
 
+    - name: install workflow bashrc
+      lineinfile: dest="/home/{{ sysadmin }}/.bashrc"
+                  regexp="^export admin_path={{ wf_user_dir }}/{{ sysadmin }}"
+                  line="export admin_path={{ wf_user_dir }}/sysadmin"
+
     - name: set shell prompt
       lineinfile: dest=/home/{{ item.user }}/.bash_profile
                   regexp="^export PS1="
