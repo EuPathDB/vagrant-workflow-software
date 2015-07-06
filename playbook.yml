@@ -34,7 +34,7 @@
       yum:  name=git
 
     - name: Create base directory
-      file: path="{{ wf_user_dir }}"
+      file: path="{{ wf_user_path }}"
             state=directory
             owner="{{ sysadmin }}"
             group="{{ wf_shared_group }}"
@@ -46,8 +46,8 @@
       sudo: no
 
     - name: initialize sysadmin directory (this will take a while)
-      script: init.sh "{{ wf_user_dir }}"
-              creates="{{ wf_user_dir }}/sysadmin"
+      script: init.sh "{{ wf_user_path }}"
+              creates="{{ wf_user_path }}/sysadmin"
       sudo: no
 
     - name: add workflow user
@@ -83,10 +83,10 @@
 
     - name: install workflow bashrc
       lineinfile: dest="/home/{{ sysadmin }}/.bashrc"
-                  regexp="^export admin_path={{ wf_user_dir }}/{{ sysadmin }}"
-                  line="export admin_path={{ wf_user_dir }}/sysadmin"
+                  regexp="^export admin_path={{ wf_user_path }}/{{ sysadmin }}"
+                  line="export admin_path={{ wf_user_path }}/sysadmin"
 
     - name: run workpuppet (this may take a while)
-      script: runworkpuppet.sh "{{ wf_user_dir }}"
+      script: runworkpuppet.sh "{{ wf_user_path }}"
       sudo: no
       changed_when: false

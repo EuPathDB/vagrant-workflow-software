@@ -51,7 +51,7 @@ Vagrant.configure(2) do |config|
         ansible.playbook = "playbook.yml"
         ansible.extra_vars = {
           sysadmin:        config.ssh.username,
-          wf_user_dir:     cfg[:wf_user_path],
+          wf_user_path:    cfg[:wf_user_path],
           wf_user:         cfg[:wf_user],
           wf_shared_group: cfg[:wf_shared_group]
         }
