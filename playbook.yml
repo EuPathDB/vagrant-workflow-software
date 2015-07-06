@@ -81,10 +81,14 @@
             owner="{{ wf_user }}"
             mode=0644
 
-    - name: install workflow bashrc
+    - name: patch sysadmin bashrc
       lineinfile: dest="/home/{{ sysadmin }}/.bashrc"
                   regexp="^export admin_path={{ wf_user_path }}/{{ sysadmin }}"
                   line="export admin_path={{ wf_user_path }}/sysadmin"
+    - name: patch sysadmin bashrc
+      lineinfile: dest="/home/{{ sysadmin }}/.bashrc"
+                  regexp="^export eupath_dir={{ wf_user_path }}"
+                  line="export admin_path={{ wf_user_path }}"
 
     - name: run workpuppet (this may take a while)
       script: runworkpuppet.sh "{{ wf_user_path }}"
