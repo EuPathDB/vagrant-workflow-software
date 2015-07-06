@@ -45,7 +45,7 @@ This allows defining properties for multiple Vagrant boxes. The above example wi
 
 `wf_shared_group` should match `shared_group` in the Puppet node manifest for the host.
 
-`wf_user` can be any name. An account of this name will be created on the virtual machine and its shell environment will be configured as a typical workflow user. This account is optionally used for testing.
+`wf_user` can be any name. An account of this name will be created on the virtual machine and its shell environment will be configured as a typical workflow user. This account is just for testing on the virtual machines, there is no corresponding value in the sPuppet manifests.
 
 ### Simulating a workflow user
 
