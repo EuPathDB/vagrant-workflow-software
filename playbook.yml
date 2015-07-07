@@ -83,7 +83,7 @@
 
     - name: patch sysadmin bashrc
       lineinfile: dest="/home/{{ sysadmin }}/.bashrc"
-                  regexp="^export admin_path={{ wf_user_path }}/{{ sysadmin }}"
+                  regexp="^export admin_path={{ wf_user_path }}/sysadmin"
                   line="export admin_path={{ wf_user_path }}/sysadmin"
     - name: patch sysadmin bashrc
       lineinfile: dest="/home/{{ sysadmin }}/.bashrc"
