@@ -4,14 +4,14 @@
 # for specifications.
 
 WF_SERVERS = {
-  :rhel5 => {
+  :el5 => {
     :vagrant_box     => 'puppetlabs/centos-5.11-64-nocm',
     :wf_hostname     => 'zcluster.rcc.uga.edu',
     :wf_user_path    => '/panfs/pstor.storage/jckscratch/eupath/workflow-software',
     :wf_user         => 'debbie',
     :wf_shared_group => 'jcklab',
   },
-  :rhel6 => {
+  :el6 => {
     :vagrant_box     => 'puppetlabs/centos-6.6-64-nocm',
     :wf_hostname     => 'consign.pmacs.upenn.edu',
     :wf_user_path    => '/project/eupathdblab/workflow-software',
@@ -28,8 +28,8 @@ Vagrant.configure(2) do |config|
   WF_SERVERS.each do |name,cfg|
     config.vm.define name do |vm_config|
 
-      vm_config.vm.box      = cfg[:vagrant_box]   if cfg[:vagrant_box]
-      vm_config.vm.hostname = cfg[:wf_hostname]      if cfg[:wf_hostname]
+      vm_config.vm.box      = cfg[:vagrant_box] if cfg[:vagrant_box]
+      vm_config.vm.hostname = cfg[:wf_hostname] if cfg[:wf_hostname]
 
       # Prepare CentOS 5 to support Ansible
       if ( /centos-5/.match(vm_config.vm.box) )

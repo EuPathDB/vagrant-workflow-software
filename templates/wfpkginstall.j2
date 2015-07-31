@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Manually install a workflow software RPM. Simulating a full Puppet
+# managed install.
+
+source {{ wf_user_path }}/sysadmin/bashrc
+
+user_path={{ wf_user_path }}
+yum_path=${user_path}/sysadmin/yum-workflow/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}/
+
+name=$1
+
+if [[ -z "$name" ]]; then
+  echo 'Usage:'
+  echo '  wfpkginstall <package-name>'
+  echo 'e.g.'
+  echo '  wfpkginstall python27-2.7.10'
+  exit 1
+fi
+
+package="$(get_latest_package.rb ${yum_path} ${name})"
+
+ourpm --prefix ${user_path} --nodeps -U ${package}
+manage_package_links.rb ${user_path} ${name} link

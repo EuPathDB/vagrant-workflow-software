@@ -25,6 +25,14 @@
       sudo: no
       when: disconnect|changed
 
+    - file: path=/home/{{ sysadmin }}/bin
+            state=directory
+
+    - template: dest=/home/{{ sysadmin }}/bin/wfpkginstall
+                src=templates/wfpkginstall.j2
+                owner="{{ sysadmin }}"
+                mode=755
+
     - name: install python-hashlib # for yumdownloader/yum 3.2.22
       yum:  name=python-hashlib
       when: ansible_distribution_major_version == '5'
@@ -46,7 +54,7 @@
       sudo: no
 
     - name: initialize sysadmin directory (this will take a while)
-      script: init.sh "{{ wf_user_path }}"
+      script: bin/init.sh "{{ wf_user_path }}"
               creates="{{ wf_user_path }}/sysadmin"
       sudo: no
 
@@ -76,7 +84,7 @@
                       key="{{ lookup('file', 'scratch/authorized_keys') }}"
 
     - name: install workflow bashrc
-      copy: src=workflow_bashrc
+      copy: src=files/workflow_bashrc
             dest="/home/{{ wf_user }}/.bashrc"
             owner="{{ wf_user }}"
             mode=0644
@@ -91,6 +99,6 @@
                   line="export admin_path={{ wf_user_path }}"
 
     - name: run workpuppet (this may take a while)
-      script: runworkpuppet.sh "{{ wf_user_path }}"
+      script: bin/runworkpuppet.sh "{{ wf_user_path }}"
       sudo: no
       changed_when: false
