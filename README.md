@@ -91,6 +91,8 @@ A `wfpkginstall` script is included in the vagrant user's home `bin` dir. This s
 
     wfpkginstall python27-2.7.10
 
+_Tip: Tab completion is available for `wfpkginstall`._
+
 ### Provisioning
 
 The `init.sh` script initializes and bootstraps the `${BASE_DIR}/sysadmin` directory with required infrastructure. It's mostly copy/paste from the wiki instructions (and the two should be kept in sync if you make changes) with a few tweaks to aid Vagrant VM work. The design is such that `${BASE_DIR}/sysadmin` is only built on the first `vagrant up`. Subsequent `vagrant provision` invocations will skip `init.sh` if `${BASE_DIR}/sysadmin` exists. So if if you need to re-provision `${BASE_DIR}/sysadmin` you might as well `vagrant destroy` and start over.

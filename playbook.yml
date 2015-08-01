@@ -28,10 +28,13 @@
     - file: path=/home/{{ sysadmin }}/bin
             state=directory
 
-    - template: dest=/home/{{ sysadmin }}/bin/wfpkginstall
+    - template: dest=/usr/bin/wfpkginstall
                 src=templates/wfpkginstall.j2
                 owner="{{ sysadmin }}"
                 mode=755
+    - template: dest=/etc/profile.d/wfpkginstall.completion.sh
+                src=templates/wfpkginstall.completion.sh.j2
+                mode=644
 
     - name: install python-hashlib # for yumdownloader/yum 3.2.22
       yum:  name=python-hashlib
@@ -96,7 +99,7 @@
     - name: patch sysadmin bashrc
       lineinfile: dest="/home/{{ sysadmin }}/.bashrc"
                   regexp="^export eupath_dir={{ wf_user_path }}"
-                  line="export admin_path={{ wf_user_path }}"
+                  line="export eupath_dir={{ wf_user_path }}"
 
     - name: run workpuppet (this may take a while)
       script: bin/runworkpuppet.sh "{{ wf_user_path }}"

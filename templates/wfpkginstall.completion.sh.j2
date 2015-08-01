@@ -1,0 +1,25 @@
+
+_wfpkginstall() {
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+  local yum_repo={{ wf_user_path }}/sysadmin/yum-workflow/{{ ansible_distribution_major_version }}/{{ ansible_architecture }}
+
+  case "$prev" in
+  
+  wfpkginstall|-*)
+    case "$cur" in 
+    *)
+      local rpms=($(find ${yum_repo} -maxdepth 1 -type f -name '*.rpm' | xargs -n1 -i basename '{}'))
+      local names=${rpms[@]%-*-*}
+      COMPREPLY=( $(compgen -W "${names}" -- "$cur") )
+      ;;
+    esac
+    ;;
+  *)
+    ;;
+  esac
+}
+complete -F "_wfpkginstall" "wfpkginstall"
+complete -F "_wfpkginstall" "/usr/bin/wfpkginstall"
+
