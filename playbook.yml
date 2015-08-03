@@ -39,10 +39,10 @@
     - name: install python-hashlib # for yumdownloader/yum 3.2.22
       yum:  name=python-hashlib
       when: ansible_distribution_major_version == '5'
-    - name: install zlib-devel
-      yum:  name=zlib-devel
-    - name: install git
-      yum:  name=git
+    - yum:  name='{{ item }}'
+      with_items:
+        - git
+        - zlib-devel
 
     - name: Create base directory
       file: path="{{ wf_user_path }}"
