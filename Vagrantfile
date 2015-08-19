@@ -7,14 +7,14 @@ WF_SERVERS = {
   :el5 => {
     :vagrant_box     => 'puppetlabs/centos-5.11-64-nocm',
     :wf_hostname     => 'zcluster.rcc.uga.edu',
-    :wf_user_path    => '/panfs/pstor.storage/jckscratch/eupath/workflow-software',
+    :wf_eupath_dir   => '/panfs/pstor.storage/jckscratch/eupath',
     :wf_user         => 'debbie',
     :wf_shared_group => 'jcklab',
   },
   :el6 => {
     :vagrant_box     => 'puppetlabs/centos-6.6-64-nocm',
     :wf_hostname     => 'consign.pmacs.upenn.edu',
-    :wf_user_path    => '/project/eupathdblab/workflow-software',
+    :wf_eupath_dir   => '/project/eupathdblab',
     :wf_user         => 'debbie',
     :wf_shared_group => 'eupathdblab',
   }
@@ -51,7 +51,8 @@ Vagrant.configure(2) do |config|
         ansible.playbook = "playbook.yml"
         ansible.extra_vars = {
           sysadmin:        config.ssh.username,
-          wf_user_path:    cfg[:wf_user_path],
+          wf_eupath_dir:   cfg[:wf_eupath_dir],
+          wf_user_path:    "#{cfg[:wf_eupath_dir]}/workflow-software",
           wf_user:         cfg[:wf_user],
           wf_shared_group: cfg[:wf_shared_group]
         }

@@ -4,6 +4,11 @@
 
   tasks:
 
+    # EPEL for internal dev experimentation on VMs. clusters don't necessarily
+    # have EPEL yum repo (nor can we benefit from it if they do).
+    - yum: name=epel-release
+      sudo: yes
+
       # Some resources are behind firewalls and access rules. Test early
       # that we have access to them.
     - name: testing access to restricted URL
@@ -98,8 +103,8 @@
                   line="export admin_path={{ wf_user_path }}/sysadmin"
     - name: patch sysadmin bashrc
       lineinfile: dest="/home/{{ sysadmin }}/.bashrc"
-                  regexp="^export eupath_dir={{ wf_user_path }}"
-                  line="export eupath_dir={{ wf_user_path }}"
+                  regexp="^export eupath_dir={{ wf_eupath_dir }}"
+                  line="export eupath_dir={{ wf_eupath_dir }}"
 
     - name: run workpuppet (this may take a while)
       script: bin/runworkpuppet.sh "{{ wf_user_path }}"
