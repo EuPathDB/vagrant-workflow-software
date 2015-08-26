@@ -5,6 +5,11 @@
 # be kept in sync if you make changes) with a few tweaks to aid Vagrant VM work.
 # https://wiki.apidb.org/index.php/PreparingClusters
 
+puppet-cluster_branch=3.4.3
+ruby_ver=2.2.3
+openssl_ver=1.0.1p
+rubygems_ver=2.4.8
+
 BASE_DIR=${1-/eupath/workflow-software}
 export admin_path="${BASE_DIR}/sysadmin"
 
@@ -18,40 +23,40 @@ mkdir -p $admin_path/{software,src}
 
 echo "downloading source code"
 cd $admin_path/src/
-curl -s -O http://software.apidb.org/source/ruby-1.8.7-p357.tar.gz
-curl -s -O http://software.apidb.org/source/openssl-1.0.1j.tar.gz
-curl -s -O http://software.apidb.org/source/rubygems-1.8.15.tgz
+curl -s -O http://software.apidb.org/source/ruby-${ruby_ver}.tar.gz
+curl -s -O http://software.apidb.org/source/openssl-${openssl_ver}.tar.gz
+curl -s -O http://software.apidb.org/source/rubygems-${rubygems_ver}.tgz
 
 for i in *gz; do
   file "$i" | grep -q 'gzip compressed' || { echo "$PWD/$i is not valid"; exit 1; }
   tar zxf $i;
 done;
 
-cd $admin_path/src/openssl-1.0.1j
+cd $admin_path/src/openssl-${openssl_ver}
 
-./config --prefix=$admin_path/software/openssl-1.0.1j shared
+./config --prefix=$admin_path/software/openssl-${openssl_ver} shared
 make install
 
 
-cd $admin_path/src/ruby-1.8.7-p357
+cd $admin_path/src/ruby-${ruby_ver}
 ./configure \
-  --prefix=$admin_path/software/ruby-1.8.7-p357 \
-  --with-openssl-dir=$admin_path/software/openssl-1.0.1j \
+  --prefix=$admin_path/software/ruby-${ruby_ver} \
+  --with-openssl-dir=$admin_path/software/openssl-${openssl_ver} \
   --disable-option-checking
 make
 make install
 
 # get the ruby version you want in your PATH
-export PATH=$admin_path/software/ruby-1.8.7-p357/bin:$PATH
+export PATH=$admin_path/software/ruby-${ruby_ver}/bin:$PATH
 
-cd $admin_path/src/rubygems-1.8.15
-ruby setup.rb --prefix=$admin_path/software/rubygems-1.8.15
+cd $admin_path/src/rubygems-${rubygems_ver}
+ruby setup.rb --prefix=$admin_path/software/rubygems-${rubygems_ver}
 
 # get the new gem in PATH
-export PATH=$admin_path/software/rubygems-1.8.15/bin:$PATH
+export PATH=$admin_path/software/rubygems-${rubygems_ver}/bin:$PATH
 
-export GEM_HOME=$admin_path/software/rubygems-1.8.15/gems
-export RUBYLIB=$admin_path/software/rubygems-1.8.15/lib
+export GEM_HOME=$admin_path/software/rubygems-${rubygems_ver}/gems
+export RUBYLIB=$admin_path/software/rubygems-${rubygems_ver}/lib
 
 gem install bundler
 
@@ -63,8 +68,8 @@ sh make_admin_bin.sh/make_admin_bin.sh $admin_path
 cat > $admin_path/bashrc <<EOF
 export admin_path=$admin_path
 export PATH=\$admin_path/bin:/usr/bin:/bin
-export GEM_HOME=\$admin_path/software/rubygems-1.8.15/gems
-export RUBYLIB=\$admin_path/software/rubygems-1.8.15/lib
+export GEM_HOME=\$admin_path/software/rubygems-${rubygems_ver}/gems
+export RUBYLIB=\$admin_path/software/rubygems-${rubygems_ver}/lib
 export RUBYOPT=rubygems
 EOF
 
@@ -74,7 +79,7 @@ EOF
 # would be cloned in situ on a real cluster.
 git_wd=/vagrant/scratch/puppet-cluster
 if [[ ! -d $git_wd ]]; then
-  git clone git@git.apidb.org:puppet-cluster.git $git_wd
+  git clone -b ${puppet-cluster_branch} git@git.apidb.org:puppet-cluster.git $git_wd
 fi
 ln -nsf $git_wd $admin_path/puppet
 
