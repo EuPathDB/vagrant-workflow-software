@@ -6,7 +6,7 @@
 # https://wiki.apidb.org/index.php/PreparingClusters
 
 puppet-cluster_branch=3.4.3
-ruby_ver=2.2.3
+ruby_ver=2.1.7 # puppet 3 is not well supported under ruby 2.2; https://tickets.puppetlabs.com/browse/PUP-3796
 openssl_ver=1.0.1p
 rubygems_ver=2.4.8
 
