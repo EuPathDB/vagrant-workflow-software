@@ -8,7 +8,7 @@
 BASE_DIR=${1-/eupath/workflow-software}
 export admin_path="${BASE_DIR}/sysadmin"
 
-[[ -d "$admin_path" ]] && exit 0
+[[ -d "$admin_path" ]] && { echo "$admin_path exists; skipping."; exit 0; }
 
 # start clean
 export PATH=/usr/bin:/bin
@@ -93,6 +93,6 @@ cp $admin_path/puppet/modules/software/files/workpuppet $admin_path/bin/
 # just to save download time when re-provisioning a VM. 
 # This is Vagrant-specific. On a real cluster this directory is
 # created in situ by the workpuppet script.
-mkdir /vagrant/scratch/yum-workflow
+mkdir -p /vagrant/scratch/yum-workflow
 ln -s /vagrant/scratch/yum-workflow $admin_path/yum-workflow
 
