@@ -63,7 +63,7 @@
 
     - name: initialize sysadmin directory (this will take a while)
       script: bin/init.sh "{{ wf_user_path }}"
-              creates="{{ wf_user_path }}/sysadmin"
+              creates="{{ wf_user_path }}/sysadmin/installed"
       sudo: no
 
     - name: add workflow user
