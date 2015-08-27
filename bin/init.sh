@@ -5,15 +5,20 @@
 # be kept in sync if you make changes) with a few tweaks to aid Vagrant VM work.
 # https://wiki.apidb.org/index.php/PreparingClusters
 
-puppet-cluster_branch=3.4.3
+puppet_cluster_branch=3.8.2
 ruby_ver=2.1.7 # puppet 3 is not well supported under ruby 2.2; https://tickets.puppetlabs.com/browse/PUP-3796
 openssl_ver=1.0.1p
 rubygems_ver=2.4.8
 
 BASE_DIR=${1-/eupath/workflow-software}
 export admin_path="${BASE_DIR}/sysadmin"
+is_installed="${admin_path}/installed"
 
-[[ -d "$admin_path" ]] && exit 0
+[[ -f "$is_installed" ]] && {
+  echo "Already installed. Remove $is_installed to reinstall.";
+  echo "Even better, remove all of $admin_path to ensure clean install."
+  exit 0;
+}
 
 # start clean
 export PATH=/usr/bin:/bin
@@ -62,7 +67,7 @@ gem install bundler
 
 
 cd $admin_path
-git clone git://gist.github.com/1793439.git make_admin_bin.sh
+git clone git://gist.github.com/d4c9de27fecc3399014c.git make_admin_bin.sh
 sh make_admin_bin.sh/make_admin_bin.sh $admin_path
 
 cat > $admin_path/bashrc <<EOF
@@ -101,3 +106,4 @@ cp $admin_path/puppet/modules/software/files/workpuppet $admin_path/bin/
 mkdir /vagrant/scratch/yum-workflow
 ln -s /vagrant/scratch/yum-workflow $admin_path/yum-workflow
 
+date > "$is_installed"
