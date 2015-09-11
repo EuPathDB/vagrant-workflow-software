@@ -114,15 +114,15 @@
             mode=0644
 
     - name: install sysadmin dot files
-      copy: src='{{ item.src }}'
-            dest='/home/{{ sysadmin }}/{{ item.dest }}'
-            owner='{{ wf_user }}'
-            mode=0644
+      template: src='{{ item.src }}'
+                dest='/home/{{ sysadmin }}/{{ item.dest }}'
+                owner='{{ wf_user }}'
+                mode=0644
       with_items:
-        - { src: 'files/vagrant_bash_profile',
+        - { src: 'templates/vagrant_bash_profile.j2',
             dest: '.bash_profile'
           }
-        - { src: 'files/vagrant_bash_logout',
+        - { src: 'templates/vagrant_bash_logout.j2',
             dest: '.bash_logout'
           }
 
