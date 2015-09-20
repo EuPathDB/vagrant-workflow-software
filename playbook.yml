@@ -87,17 +87,6 @@
             group='{{ wf_shared_group }}'
             shell=/bin/bash
 
-      # Set a shell prompt that clearly distinguishes this VM from a real server of
-      # the same name (to help avoid accidentally doing dev work on the real server
-      # when you terminals open to both).
-    - name: set shell prompt
-      lineinfile: dest=/home/{{ item.user }}/.bash_profile
-                  regexp='^export PS1='
-                  line='export PS1="[\[$(tput setaf 1)\]\[$(tput bold)\]Simulated \[$(tput sgr0)\]\u@\h \W]\\n\[$(tput setaf 2)\]\\$ \[$(tput sgr0)\]\[$(tput sgr0)\]"'
-      with_items:
-        - { user: '{{ sysadmin }}' }
-        - { user: '{{ wf_user }}' }
-
     - name: fetch vagrant authorized_keys
       fetch: src=/home/vagrant/.ssh/authorized_keys
              dest=scratch/authorized_keys
@@ -107,16 +96,23 @@
       authorized_key: user='{{ wf_user }}'
                       key="{{ lookup('file', 'scratch/authorized_keys') }}"
 
-    - name: install workflow bashrc
-      copy: src=files/workflow_bashrc
-            dest='/home/{{ wf_user }}/.bashrc'
+    - name: install workflow dot files
+      copy: src='{{ item.src }}'
+            dest='/home/{{ wf_user }}/{{ item.dest }}'
             owner='{{ wf_user }}'
             mode=0644
+      with_items:
+        - { src: 'files/workflow_bash_profile',
+            dest: '.bash_profile'
+          }
+        - { src: 'files/workflow_bashrc',
+            dest: '.bashrc'
+          }
 
     - name: install sysadmin dot files
       template: src='{{ item.src }}'
                 dest='/home/{{ sysadmin }}/{{ item.dest }}'
-                owner='{{ wf_user }}'
+                owner='{{ sysadmin }}'
                 mode=0644
       with_items:
         - { src: 'templates/vagrant_bash_profile.j2',
