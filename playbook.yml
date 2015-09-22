@@ -45,11 +45,15 @@
     - yum:  name='{{ item }}'
       with_items:
         - zlib-devel
-        - perl-ExtUtils-MakeMaker # for Git compile
         - gettext # for Git compile
         - freetype # required by Python matplotlib, is provided on current cluster systems
         - R-core # required by python DANPOS2
         # don't install git, instead make from source in init script if needed to simulate real cluster
+
+    - yum:  name='{{ item }}'
+      with_items:
+        - perl-ExtUtils-MakeMaker # for Git compile
+      when: ansible_distribution_major_version != '5'
 
     - name: Create base directory
       file: path='{{ wf_user_path }}'
