@@ -122,18 +122,12 @@
         - { src: 'templates/vagrant_bash_profile.j2',
             dest: '.bash_profile'
           }
+        - { src: 'templates/vagrant_bashrc.j2',
+            dest: '.bashrc'
+          }
         - { src: 'templates/vagrant_bash_logout.j2',
             dest: '.bash_logout'
           }
-
-    - name: patch sysadmin bashrc
-      lineinfile: dest='/home/{{ sysadmin }}/.bashrc'
-                  regexp='^export admin_path={{ wf_user_path }}/sysadmin'
-                  line='export admin_path={{ wf_user_path }}/sysadmin'
-    - name: patch sysadmin bashrc
-      lineinfile: dest='/home/{{ sysadmin }}/.bashrc'
-                  regexp='^export eupath_dir={{ wf_eupath_dir }}'
-                  line='export eupath_dir={{ wf_eupath_dir }}'
 
     - name: run workpuppet (this may take a while)
       script: bin/runworkpuppet.sh '{{ wf_user_path }}'
