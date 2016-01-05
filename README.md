@@ -1,6 +1,6 @@
 ## vagrant-workflow-software
 
-Vagrant manifest to set up a VirtualBox instance for developing and testing the deployment of workflow software for compute clusters and workflow servers. See https://wiki.apidb.org/index.php/PreparingClusters for specifications.
+Vagrant manifest to set up a VirtualBox instance for developing and testing the deployment of workflow software for compute clusters and workflow servers. See [https://wiki.apidb.org/index.php/PreparingClusters](https://wiki.apidb.org/index.php/PreparingClusters) for specifications.
 
 ### Requirements
 
@@ -39,13 +39,13 @@ The `Vagrantfile` specifies a dictionary at the top.
 
 This allows defining properties for multiple Vagrant boxes. The above example will set up CentOS 5 and CentOS 6 environments on two virtual machines. These will be named according the top key values (`el5` and `el6` in this example). These names will be used with `vagrant ssh` to identify which managed machine to connect to.
 
-`wf_hostname` can be given the name of an existing cluster. This permits using an existing Puppet node manifest and leverages existing profile configurations (e.g. `$eupath_dir/etc/bashrc`) that use hostname conditionals. Note that different compute clusters use various OS versions (e.g. CentOS 5 and CentOS 6). Be sure the `vagrant_box` in the `WF_SERVERS` dictionary is configured for a Vagrant box with a matching OS for the chosen `wf_hostname`.
+`wf_hostname` can be given the name of an existing cluster. This permits using an existing Puppet node manifest and leverages existing profile configurations (e.g. `$eupath_dir/etc/bashrc`) that use hostname conditionals. Note that different compute clusters use various OS versions (e.g. CentOS 5 and CentOS 6). Be sure the `vagrant_box` in the `WF_SERVERS` dictionary is configured for a Vagrant box with a matching OS for the chosen `wf_hostname`. For example, the physical zcluster in the datacenter uses CentOS 5 so be sure the virtual machine simulation also uses CentOS 5.
 
 `wf_user_path` should match `user_path` in the Puppet node manifest for the host.
 
 `wf_shared_group` should match `shared_group` in the Puppet node manifest for the host.
 
-`wf_user` can be any name. An account of this name will be created on the virtual machine and its shell environment will be configured as a typical workflow user. This account is just for testing on the virtual machines, there is no corresponding value in the sPuppet manifests.
+`wf_user` can be any name. An account of this name will be created on the virtual machine and its shell environment will be configured as a typical workflow user. This account is just for testing on the virtual machines, there is no corresponding value in the Puppet manifests.
 
 ### Simulating a workflow user
 
@@ -57,7 +57,7 @@ To log in as `debbie`, run
 
 where `el6` is Vagrant box you want to connect to (as defined in the Vagrantfile's `WF_SERVER` dictionary).
 
-### Updating workflow software
+### Installing and Updating workflow software
 
 The "sysadmin" of the workflow software infrastructure is the user `vagrant`. This user should be used for updating the workflow software and changing the deployment infrastructure. The `workpuppet` script is used for routine updates. See the wiki for details.
 
@@ -79,7 +79,7 @@ _Caution: When screwing around in terminal windows be very careful which window 
 
 __The Development Environment__
 
-Git cloning from git.apidb.org requires ssh key authentication. The `Vagrantfile` specifies `config.ssh.forward_agent = true` to use your host ssh agent - so you need an agent running.
+Git cloning from git.apidb.org requires ssh key authentication. The `Vagrantfile` specifies `config.ssh.forward_agent = true` to use your host ssh agent - so you need an agent running on your Vagrant host.
 
 The `init.sh` script that does the initial provisioning assumes a VM that mounts the Vagrant project directory from host to `/vagrant` on the guest. The `puppetlabs/centos-6.6-64-nocm` specified in the `Vagrantfile` satisfies this requirement.
 
@@ -87,11 +87,15 @@ One of the temptations of having a virtualized development environment is workin
 
 ### Manual Package Deployment
 
-A `wfpkginstall` script is included in the vagrant user's home `bin` dir. This script can be used to install a single package without going through Puppet and YUM repository. Manually place the desired rpm file into `$admin_path/sysadmin/yum-workflow/<os_major_version>/x86_64/` and then run the `wfpkginstall` script with the package name (not file name). This simulates what Puppet will do, including processing the `MANIFEST.EUPATH` file bundled with the software package.
+If you have a newly made RPM to test before adding to the YUM repository, you can copy the RPM to the virtual machine and install it manually.
+
+A `wfpkginstall` script is included in the vagrant user's home `bin` dir. This script can be used to install a single package without going through Puppet and YUM repository. Manually place the desired rpm file into `$admin_path/yum-workflow/<os_major_version>/x86_64/` and then run the `wfpkginstall` script with the package name (not file name). This simulates what Puppet will do, including processing the `MANIFEST.EUPATH` file bundled with the software package.
 
     wfpkginstall python27-2.7.10
 
-_Tip: Tab completion is available for `wfpkginstall`._
+**Tip:** The `$admin_path/yum-workflow/<os_major_version>/x86_64/` directory is shared with the Vagrant host under the `scratch` directory of the Vagrant project. The [`vagrant-rpmbuild`](https://github.com/EuPathDB/vagrant-rpmbuild) project - the recommended environment for generating workflow-software rpms - places the rpm files built there under the `scratch` directory of that project. Therefore you can use host tools (e.g. drag-and-drop) to quickly copy the rpm file from the `rpmbuild` to the `workflow-software` project and then run `wfpkginstall` on the guest.
+
+**Tip:** Tab completion is available for `wfpkginstall`.
 
 ### Provisioning
 
