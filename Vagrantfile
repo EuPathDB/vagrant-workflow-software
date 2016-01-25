@@ -17,7 +17,14 @@ WF_SERVERS = {
     :wf_eupath_dir   => '/project/eupathdblab',
     :wf_user         => 'debbie',
     :wf_shared_group => 'eupathdblab',
-  }
+  },
+  :el7 => {
+    :vagrant_box     => 'ebrc/centos-7-64-puppet',
+    :wf_hostname     => 'holly.pcbi.upenn.edu',
+    :wf_eupath_dir   => '/eupath',
+    :wf_user         => 'debbie',
+    :wf_shared_group => 'cbil',
+  },
 }
 
 Vagrant.configure(2) do |config|

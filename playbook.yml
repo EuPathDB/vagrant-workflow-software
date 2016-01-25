@@ -88,9 +88,9 @@
     - yum:  name='{{ item }}'
       with_items:
         - zlib-devel
-        - gettext # for Git compile
+        - gettext  # for Git compile
         - freetype # required by Python matplotlib, is provided on current cluster systems
-        - R-core # required by python DANPOS2
+        - R-core   # required by python DANPOS2
         # don't install git, instead make from source in init script if needed to simulate real cluster
 
     - yum:  name='{{ item }}'
@@ -127,6 +127,15 @@
       args: 
         creates: '{{ wf_user_path }}/sysadmin/installed'
       sudo: no
+
+    # puppet host facter requires ifconfig (not avail. on EL7 or
+    # net-tools. (This is the standalone puppet used to manage workflow
+    # RPM installs, see workpuppet script). This requirement is fixed in
+    # modern facter. https://github.com/puppetlabs/facter/pull/730
+    - yum:  name='{{ item }}'
+      with_items:
+        - net-tools
+      when: ansible_distribution_major_version == '7'
 
     - name: run workpuppet (this may take a while)
       script: bin/runworkpuppet.sh '{{ wf_user_path }}'
