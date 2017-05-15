@@ -4,13 +4,13 @@
 # for specifications.
 
 WF_SERVERS = {
-  :el5 => {
-    :vagrant_box     => 'puppetlabs/centos-5.11-64-nocm',
-    :wf_hostname     => 'zcluster.rcc.uga.edu',
-    :wf_eupath_dir   => '/panfs/pstor.storage/jckscratch/eupath',
-    :wf_user         => 'debbie',
-    :wf_shared_group => 'jcklab',
-  },
+#   :el5 => {
+#     :vagrant_box     => 'puppetlabs/centos-5.11-64-nocm',
+#     :wf_hostname     => 'zcluster.rcc.uga.edu',
+#     :wf_eupath_dir   => '/panfs/pstor.storage/jckscratch/eupath',
+#     :wf_user         => 'debbie',
+#     :wf_shared_group => 'jcklab',
+#   },
   :el6 => {
     :vagrant_box     => 'puppetlabs/centos-6.6-64-nocm',
     :wf_hostname     => 'consign.pmacs.upenn.edu',
@@ -20,7 +20,7 @@ WF_SERVERS = {
   },
   :el7 => {
     :vagrant_box     => 'ebrc/centos-7-64-puppet',
-    :wf_hostname     => 'holly.pcbi.upenn.edu',
+    :wf_hostname     => 'elm.vm',
     :wf_eupath_dir   => '/eupath',
     :wf_user         => 'debbie',
     :wf_shared_group => 'cbil',
