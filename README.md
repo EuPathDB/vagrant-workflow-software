@@ -158,6 +158,12 @@ the `wfpkginstall` script with the package name (not file name). This
 simulates what Puppet will do, including processing the
 `MANIFEST.EUPATH` file bundled with the software package.
 
+*Limitation: You may encounter conflicts if you use `wfpkginstall` to
+install a newer version of a package that is already installed. In such
+a case you should add the new package to `$active_software` in the
+`packages.pp` Puppet manifest (and the old version to
+`$inactive_software`), and then run the `workpuppet` script.*
+
     wfpkginstall python27-2.7.10
 
 **Tip:** The `$admin_path/yum-workflow/<os_major_version>/x86_64/`
