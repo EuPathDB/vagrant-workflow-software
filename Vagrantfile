@@ -55,7 +55,7 @@ Vagrant.configure(2) do |config|
       end
 
       vm_config.vm.provision :ansible do |ansible|
-        ansible.playbook = "playbook.yml"
+        ansible.playbook = "ansible/playbook.yml"
         ansible.extra_vars = {
           sysadmin:        config.ssh.username,
           wf_eupath_dir:   cfg[:wf_eupath_dir],
