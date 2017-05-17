@@ -40,17 +40,23 @@
         group: '{{ wf_shared_group }}'
         shell: /bin/bash
 
-    # START copying vagrant's key to wf_user account for easy login
-    - name: fetch vagrant authorized_keys
+    # START copying vagrant's key to wf_user account for easy login.
+    # Need to stage to Ansible host because lookup() runs locally.
+    - name: staging vagrant authorized_keys to local host
       fetch:
         src: /home/vagrant/.ssh/authorized_keys
-        dest: ../scratch/authorized_keys
+        dest: /tmp/vagrant-workflow-software-authorized_keys
         flat: yes
 
     - name: workflow user authorized_keys
       authorized_key:
         user: '{{ wf_user }}'
-        key: "{{ lookup('file', '../scratch/authorized_keys') }}"
+        key: "{{ lookup('file', '/tmp/vagrant-workflow-software-authorized_keys') }}"
+
+    - name: remove staged vagrant authorized_keys from local host
+      file:
+        path: /tmp/vagrant-workflow-software-authorized_keys
+        state: absent
     # END copying vagrant's key to wf_user account for easy login
 
     - name: install workflow dot files
