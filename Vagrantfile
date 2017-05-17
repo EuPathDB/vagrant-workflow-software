@@ -20,10 +20,10 @@ WF_SERVERS = {
   },
   :el7 => {
     :vagrant_box     => 'ebrc/centos-7-64-puppet',
-    :wf_hostname     => 'elm.vm',
+    :wf_hostname     => 'elm.pcbi.upenn.edu',
     :wf_eupath_dir   => '/eupath',
     :wf_user         => 'debbie',
-    :wf_shared_group => 'cbil',
+    :wf_shared_group => 'eupa',
   },
 }
 
