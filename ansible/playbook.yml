@@ -1,53 +1,62 @@
 ---
 - hosts: all
-  sudo: yes
+  become: yes
 
   tasks:
 
       # Some resources are behind firewalls and access rules. Test early
       # that we have access to them.
     - name: testing access to restricted URL
-      get_url: url=http://software.apidb.org/source/
-               dest=/dev/null
-               force=yes
+      get_url:
+        url: http://software.apidb.org/source/
+        dest: /dev/null
+        force: yes
       changed_when: false
 
     - name: change sysadmin user group
-      group: name='{{ wf_shared_group }}' state=present
-    - user: name='{{ sysadmin }}'
-            group='{{ wf_shared_group }}'
+      group:
+        name: '{{ wf_shared_group }}'
+        state: present
+    - user:
+        name: '{{ sysadmin }}'
+        group: '{{ wf_shared_group }}'
       register: disconnect
     - name: disconnect
       # Force ssh reconnect to get a new shell with updated group info (so files get
       # correct group ownership). This is done by killing the client ssh multiplex process
       # on the ansible driver.
       local_action: command pkill -f 'ansible-ssh-{{ ansible_ssh_host }}-{{ ansible_ssh_port }}-'
-      sudo: no
+      become: no
       when: disconnect|changed
 
-    - file: path=/home/{{ sysadmin }}/bin
-            state=directory
-      sudo: no
+    - file:
+        path: /home/{{ sysadmin }}/bin
+        state: directory
+      become: no
 
     - name: add workflow user
-      user: name='{{ wf_user }}'
-            group='{{ wf_shared_group }}'
-            shell=/bin/bash
+      user:
+        name: '{{ wf_user }}'
+        group: '{{ wf_shared_group }}'
+        shell: /bin/bash
 
     - name: fetch vagrant authorized_keys
-      fetch: src=/home/vagrant/.ssh/authorized_keys
-             dest=scratch/authorized_keys
-             flat=yes
+      fetch:
+        src: /home/vagrant/.ssh/authorized_keys
+        dest: scratch/authorized_keys
+        flat: yes
 
     - name: workflow user authorized_keys
-      authorized_key: user='{{ wf_user }}'
-                      key="{{ lookup('file', 'scratch/authorized_keys') }}"
+      authorized_key:
+        user: '{{ wf_user }}'
+        key: "{{ lookup('file', 'scratch/authorized_keys') }}"
 
     - name: install workflow dot files
-      copy: src='{{ item.src }}'
-            dest='/home/{{ wf_user }}/{{ item.dest }}'
-            owner='{{ wf_user }}'
-            mode=0644
+      copy:
+        src: '{{ item.src }}'
+        dest: '/home/{{ wf_user }}/{{ item.dest }}'
+        owner: '{{ wf_user }}'
+        mode: '0644'
       with_items:
         - { src: 'files/workflow_bash_profile',
             dest: '.bash_profile'
@@ -57,10 +66,11 @@
           }
 
     - name: install sysadmin dot files
-      template: src='{{ item.src }}'
-                dest='/home/{{ sysadmin }}/{{ item.dest }}'
-                owner='{{ sysadmin }}'
-                mode=0644
+      template:
+        src: '{{ item.src }}'
+        dest: '/home/{{ sysadmin }}/{{ item.dest }}'
+        owner: '{{ sysadmin }}'
+        mode: '0644'
       with_items:
         - { src: 'templates/vagrant_bash_profile.j2',
             dest: '.bash_profile'
@@ -72,20 +82,25 @@
             dest: '.bash_logout'
           }
 
-    - template: dest=/usr/bin/wfpkginstall
-                src=templates/wfpkginstall.j2
-                owner='{{ sysadmin }}'
-                mode=755
-    - template: dest=/etc/profile.d/wfpkginstall.completion.sh
-                src=templates/wfpkginstall.completion.sh.j2
-                mode=644
+    - template:
+        dest: /usr/bin/wfpkginstall
+        src: templates/wfpkginstall.j2
+        owner: '{{ sysadmin }}'
+        mode: '0755'
+    - template:
+        dest: /etc/profile.d/wfpkginstall.completion.sh
+        src: templates/wfpkginstall.completion.sh.j2
+        mode: '0644'
 
     # EPEL for internal dev experimentation on VMs. clusters don't necessarily
     # have EPEL yum repo (nor can we benefit from it if they do).
-    - yum: name=epel-release
-      sudo: yes
+    - name: configure EPEL YUM repo
+      yum:
+        name: epel-release
 
-    - yum:  name='{{ item }}'
+    - name: yum install dependencies
+      yum:
+        name: '{{ item }}'
       with_items:
         - zlib-devel
         - gettext  # for Git compile
@@ -93,51 +108,60 @@
         - R-core   # required by python DANPOS2
         # don't install git, instead make from source in init script if needed to simulate real cluster
 
-    - yum:  name='{{ item }}'
+    - name: yum install Git dependencies for EL5
+      yum:
+        name: '{{ item }}'
       with_items:
         - perl-ExtUtils-MakeMaker # for Git compile
       when: ansible_distribution_major_version != '5'
 
     - name: Create base directory
-      file: path='{{ wf_user_path }}'
-            state=directory
-            owner='{{ sysadmin }}'
-            group='{{ wf_shared_group }}'
+      file:
+        path: '{{ wf_user_path }}'
+        state: directory
+        owner: '{{ sysadmin }}'
+        group: '{{ wf_shared_group }}'
 
     - name: add git host to known_hosts
-      known_hosts: path='/home/{{ sysadmin }}/.ssh/known_hosts'
-                   host='git.apidb.org'
-                   key='{{ lookup('pipe','ssh-keyscan git.apidb.org') }}'
-      sudo: no
+      known_hosts:
+        path: '/home/{{ sysadmin }}/.ssh/known_hosts'
+        host: 'git.apidb.org'
+        key: "{{ lookup('pipe','ssh-keyscan git.apidb.org') }}"
+      become: no
 
     - name: install python-ssl for python 2.4 SSL validation
-      yum:  name=python-ssl
+      yum:
+        name: python-ssl
       when: ansible_distribution_major_version == '5'
 
     - name: install python-devel for python-hashlib compile in workflow-software-sysadmin-init.sh
-      yum:  name=python-devel
+      yum:
+        name: python-devel
       when: ansible_distribution_major_version == '5'
 
     - name: download workflow-software-sysadmin-init.sh
-      get_url: url=http://gist.github.com/mheiges/bd0c318ac28fd448c4e5/raw
-               dest=/home/vagrant/bin/workflow-software-sysadmin-init.sh
-      sudo: no
+      get_url:
+        url: http://gist.github.com/mheiges/bd0c318ac28fd448c4e5/raw
+        dest: /home/vagrant/bin/workflow-software-sysadmin-init.sh
+      become: no
     - name: initialize sysadmin directory (this will take a while)
       shell: 'echo y | /bin/sh /home/vagrant/bin/workflow-software-sysadmin-init.sh "{{ wf_user_path }}"'
       args: 
         creates: '{{ wf_user_path }}/sysadmin/installed'
-      sudo: no
+      become: no
 
     # puppet host facter requires ifconfig (not avail. on EL7 or
-    # net-tools. (This is the standalone puppet used to manage workflow
+    # net-tools. (This refers to the standalone puppet used to manage workflow
     # RPM installs, see workpuppet script). This requirement is fixed in
     # modern facter. https://github.com/puppetlabs/facter/pull/730
-    - yum:  name='{{ item }}'
+    - name: install net-tools
+      yum:
+        name: '{{ item }}'
       with_items:
         - net-tools
       when: ansible_distribution_major_version == '7'
 
     - name: run workpuppet (this may take a while)
-      script: bin/runworkpuppet.sh '{{ wf_user_path }}'
-      sudo: no
+      script: ../bin/runworkpuppet.sh '{{ wf_user_path }}'
+      become: no
       changed_when: false
