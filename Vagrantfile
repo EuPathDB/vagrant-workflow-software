@@ -20,6 +20,7 @@ WF_SERVERS = {
   },
   :el7 => {
     :vagrant_box     => 'ebrc/centos-7-64-puppet',
+    :vagrant_box_url => 'http://software.apidb.org/vagrant/centos-7-64-puppet.json',
     :wf_hostname     => 'elm.pcbi.upenn.edu',
     :wf_eupath_dir   => '/eupath',
     :wf_user         => 'debbie',
