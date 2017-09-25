@@ -210,3 +210,15 @@ so it is persistent across `vagrant destroy`. This is just to save yum
 package download time on subsequent provisionings. The directory can be
 deleted manually if you want to test a complete provision from scratch.
 
+
+### Known Issues
+
+- The disconnect after 'change sysadmin user group' no longer works
+in modern Ansible. The 'meta: reset_connection' task seems to do
+nothing in 2.3.1.0.
+
+- workpuppet run at the end exits cleanly but doesn't install the
+bioinformatics software. Possibly due to
+`Dependency File[/project/eupathdblab/workflow-software/tmp] has failures: true`
+Running workpuppet manually succeeds. Maybe related to
+failure of 'change sysadmin user group' above.
