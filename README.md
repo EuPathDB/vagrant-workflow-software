@@ -221,4 +221,7 @@ nothing in 2.3.1.0.
 bioinformatics software. Possibly due to
 `Dependency File[/project/eupathdblab/workflow-software/tmp] has failures: true`
 Running workpuppet manually succeeds. Maybe related to
-failure of 'change sysadmin user group' above.
+failure of 'change sysadmin user group' above. (this seems to be the case
+as waiting a couple of minutes after 'change sysadmin user group' fails
+before running provision again (giving time for multiplexing to timeout)
+seems to workaround this issue.
