@@ -141,8 +141,10 @@
       known_hosts:
         path: '/home/{{ sysadmin }}/.ssh/known_hosts'
         host: 'git.apidb.org'
-        # keyscan hashing required for port specificity
-        key: "{{ lookup('pipe','ssh-keyscan -H -p2112 git.apidb.org') }}"
+        # keyscan hashing required for port specificity.
+        # lookup() happens on Ansible control host. ssh-keyscan on OS X 10.10
+        # does not support ecdsa so limit keyscan to rsa,dsa.
+        key: "{{ lookup('pipe','ssh-keyscan -t rsa,dsa -H -p2112 git.apidb.org') }}"
       become: no
 
     - name: install python-ssl for python 2.4 SSL validation
