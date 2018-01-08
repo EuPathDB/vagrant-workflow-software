@@ -22,16 +22,17 @@
         group: '{{ wf_shared_group }}'
       register: disconnect
 
-    - name: disconnect
-      # Force ssh reconnect to get a new shell with updated group info (so files get
-      # correct group ownership). This is done by killing the client ssh multiplex process
-      # on the ansible driver.
-      #
-      # AS OF ANSIBLE 2.x OR SO, THIS NO LONGER WORKS. THE PLAYBOOK FAILS AND
-      # YOU WILL HAVE TO RUN `ansible provision` to continue.
-      # See also
-      #   https://github.com/ansible/ansible/issues/29997
-      local_action: command pkill -f 'ansible-ssh-{{ ansible_ssh_host }}-{{ ansible_ssh_port }}-'
+    - name: reset connection
+      # Reset ssh connection to get a new shell with updated group info (so files get
+      # correct group ownership).
+      # The intended way to do this (meta: reset_connection) is not working in 2.4.x,
+      # so using suggested workaround.
+      # https://github.com/ansible/ansible/issues/27520
+      #meta: reset_connection
+      local_action:
+        module: file
+        path: "~/.ansible/cp/{{ hostvars[inventory_hostname]['ansible_host'] }}-{{ hostvars[inventory_hostname]['ansible_port'] }}-{{ hostvars[inventory_hostname]['ansible_user'] }}"
+        state: absent
       become: no
       when: disconnect|changed
 
