@@ -149,6 +149,8 @@
     - name: get git.apidb.org host key
       shell: ssh-keyscan -p2112 git.apidb.org
       register: git_host_key
+    - debug:
+        var: git_host_key.stdout
     - name: add git host to known_hosts.
       known_hosts:
         path: '/home/{{ sysadmin }}/.ssh/known_hosts'
