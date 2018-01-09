@@ -158,8 +158,8 @@
         url: http://gist.github.com/mheiges/bd0c318ac28fd448c4e5/raw
         dest: /home/vagrant/bin/workflow-software-sysadmin-init.sh
       become: no
-    - name: initialize sysadmin directory (this will take a while)
-      shell: 'echo y | /bin/sh /home/vagrant/bin/workflow-software-sysadmin-init.sh "{{ wf_user_path }}"'
+    - name: "initialize sysadmin directory (this will take a while, monitor /home/{{ sysadmin }}/workflow-software-sysadmin-init.log for status)"
+      shell: 'echo y | /bin/sh /home/vagrant/bin/workflow-software-sysadmin-init.sh "{{ wf_user_path }}" 2>&1 > /home/{{ sysadmin }}/workflow-software-sysadmin-init.log'
       args: 
         creates: '{{ wf_user_path }}/sysadmin/installed'
       become: no
@@ -175,7 +175,10 @@
         - net-tools
       when: ansible_distribution_major_version == '7'
 
-    - name: run workpuppet (this may take a while)
-      script: ../bin/runworkpuppet.sh '{{ wf_user_path }}'
+    - set_fact:
+        workpuppet_log: "/home/{{ sysadmin }}/workpuppet.log"
+
+    - name: "run workpuppet (this may take a while, monitor {{ workpuppet_log }} for status)"
+      script: ../bin/runworkpuppet.sh '{{ wf_user_path }}' '{{ workpuppet_log}}'
       become: no
       changed_when: false
