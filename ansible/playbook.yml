@@ -139,25 +139,9 @@
         owner: '{{ sysadmin }}'
         group: '{{ wf_shared_group }}'
 
-      # lookup() happens on Ansible control host. ssh-keyscan on OS X
-      # 10.10 does not support ecdsa keys used git.apidb.org, so getting
-      # host keys from VM's Linux shell. Be aware that ssh-keyscan
-      # output varies with version (may or may not need -H to include
-      # port in output, may or may not include brackets around hostname)
-      # and that affects the `name` arg value required for the Ansible
-      # known_hosts module. *sigh*
-    - name: get git.apidb.org host key
-      shell: ssh-keyscan -p2112 git.apidb.org
-      register: git_host_key
-    - debug:
-        var: git_host_key.stdout
-    - name: add git host to known_hosts.
-      known_hosts:
-        path: '/home/{{ sysadmin }}/.ssh/known_hosts'
-        name: '[git.apidb.org]:2112' # match output of ssh-keyscan
-        #not-valid-on-osx key: "{{ lookup('pipe','ssh-keyscan -H -p2112 git.apidb.org') }}"
-        key: "{{ git_host_key.stdout }}"
-      become: no
+    - import_tasks: tasks/ebrc-git-knownhosts.yml
+      vars:
+        git_knownhosts_path: "/home/{{ sysadmin }}/.ssh/known_hosts"
 
     - name: install python-ssl for python 2.4 SSL validation
       yum:
