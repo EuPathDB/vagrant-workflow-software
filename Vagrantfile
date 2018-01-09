@@ -37,6 +37,7 @@ Vagrant.configure(2) do |config|
     config.vm.define name do |vm_config|
 
       vm_config.vm.box      = cfg[:vagrant_box] if cfg[:vagrant_box]
+      vm_config.vm.box_url  = cfg[:vagrant_box_url] if cfg[:vagrant_box_url]
       vm_config.vm.hostname = cfg[:wf_hostname] if cfg[:wf_hostname]
 
       # Prepare CentOS 5 to support Ansible
