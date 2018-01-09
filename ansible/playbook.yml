@@ -6,12 +6,14 @@
 
       # Some resources are behind firewalls and access rules. Test early
       # that we have access to them.
-    - name: testing access to restricted URL
-      get_url:
-        url: http://software.apidb.org/source/
-        dest: /dev/null
-        force: yes
-      changed_when: false
+      # This trashes /dev/null w/ Ansible 2.4
+      # https://github.com/ansible/ansible/issues/34437
+#     - name: testing access to restricted URL
+#       get_url:
+#         url: http://software.apidb.org/source/
+#         dest: /dev/null
+#         force: yes
+#       changed_when: false
 
     - name: change sysadmin user group
       group:
