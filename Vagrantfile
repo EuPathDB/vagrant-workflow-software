@@ -66,6 +66,7 @@ Vagrant.configure(2) do |config|
           wf_user:         cfg[:wf_user],
           wf_shared_group: cfg[:wf_shared_group]
         }
+        ansible.raw_arguments = ENV['ANSIBLE_ARGS']
       end
 
     end # config.vm.define

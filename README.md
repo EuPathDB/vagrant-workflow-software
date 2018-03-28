@@ -192,9 +192,12 @@ Subsequent `vagrant provision` invocations will skip `init.sh` if
 `${BASE_DIR}/sysadmin` you might as well `vagrant destroy` and start
 over.
 
-Invocations of `vagrant provision` after the initial setup will always
-invoke the `workpuppet` script. This script manages the YUM repo updates
-and runs the `puppet apply`.
+Invocations of `vagrant provision` after the initial setup will invoke
+the `workpuppet` script. This script manages the YUM repo updates and
+runs the `puppet apply`. You can skip this step by passing Ansible
+`--skip-tags` via the `ANSIBLE_ARGS` environment variable.
+
+    ANSIBLE_ARGS="--skip-tags=workpuppet" vagrant provision el7
 
 The git repo of Puppet manifests is checked out to the guest
 `/vagrant/scratch` mount point and symlinked in to the
@@ -209,6 +212,13 @@ to the `/vagrant/scratch` mountpoint on the guest, shared with the host,
 so it is persistent across `vagrant destroy`. This is just to save yum
 package download time on subsequent provisionings. The directory can be
 deleted manually if you want to test a complete provision from scratch.
+
+### Re-provisioning
+
+You can skip tagged tasks by passing Ansible `--skip-tags` via the
+`ANSIBLE_ARGS` environment variable.
+
+    ANSIBLE_ARGS="--skip-tags=workpuppet" vagrant provision el7
 
 
 ### Known Issues
