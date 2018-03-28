@@ -115,6 +115,10 @@
       yum:
         name: epel-release
 
+    - name: Add EuPathDB YUM repo
+      import_tasks: tasks/eupathdb-yumrepo.yml
+      become: yes
+
     - name: yum install dependencies
       yum:
         name: '{{ item }}'
@@ -182,3 +186,5 @@
       script: ../bin/runworkpuppet.sh '{{ wf_user_path }}' '{{ workpuppet_log}}'
       become: no
       changed_when: false
+      tags:
+        - workpuppet
